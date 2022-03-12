@@ -195,4 +195,5 @@ try:
         os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
 except:
     after_error(search, model_name, is_man)
+print('Finish')
 driver.close()
