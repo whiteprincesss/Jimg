@@ -10,7 +10,8 @@ user = getuser()
 first_path = f'C:\\Users\\{user}\\Pictures'
 
 def after_error(search, model_name, is_man):
-    model = load_model(f'model/{model_name}')
+    model = load_model(f'models/{model_name}')
+    os.chdir(first_path)
     filelists = []
     filess = os.listdir(f'{search}/')
     for i in range(len(filess)):
