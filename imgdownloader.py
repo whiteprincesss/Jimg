@@ -111,7 +111,7 @@ for image in images:
         cm_time = ed_time-st_time
     else:
         cm_time = cm_time + (ed_time - st_time)
-    print(f'Downloading  -  {count} images...  남은 예상 시간  {(ed_time- st_time)*(expected_count-count): .5} sec  ', end='\r')
+    print(f'Downloading  -  {count:<5} images...  남은 예상 시간  {(ed_time- st_time)*(expected_count-count): .5} sec  ', end='\r')
 print(f'Downloading was successful!  -  {cm_time: .5} sec  complete {count} images')
 fincount = count
 os.chdir(first_path)
