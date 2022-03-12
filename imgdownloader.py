@@ -32,14 +32,22 @@ for i in range(len(IU_Keywords)):
         model = load_model('models/더 정확한 아이유.h5')
         is_iu = True
 is_man = False
+is_man_body = False
 if is_iu == False:
-    model = load_model('models/남녀.h5')
-    print('남자면 1번, 여자면 2번')
-    Q = int(input(''))
-    if Q == 1:
+    print('남자 신체면 1번, 여자 신체면 2번 그냥 남자면 3번, 그냥 여자면 4번')
+    Q_1 = int(input(''))
+    if Q_1 == 1:
+        is_man_body = True
+        model = load_model('models/몸.h5')
+    elif Q_1 == 2:
+        is_man_body = False
+        model = load_model('models/몸.h5')
+    elif Q_1 == 3:
         is_man = True
-    elif Q == 2:
+        model = load_model('models/남녀.h5')
+    elif Q_1 == 4:
         is_man = False
+        model = load_model('models/남녀.h5')
     else:
         raise TypeError('잘못 입력하셨습니다.')
 
