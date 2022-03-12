@@ -1,2 +1,7 @@
 # ignorefolder
 /__pycache__/
+/build/
+/dist/
+
+# ignore files
+imgdownloader.spec
