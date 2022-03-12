@@ -60,6 +60,7 @@ driver.get(f'https://www.google.co.kr/search?q={search}&tbm=isch')
 os.system('cls')
 
 if_dir = 0
+os.chdir(first_path)
 try:
     os.mkdir(search)
     os.chdir(search)
