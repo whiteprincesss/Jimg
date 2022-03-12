@@ -5,6 +5,7 @@ from keras.models import load_model
 from PIL import Image, ImageOps
 import shutil
 from getpass import getuser
+from glob import glob
 
 model_path = os.getcwd()
 user = getuser()
@@ -68,6 +69,9 @@ def after_error(search, model_name, is_man):
             j += 1
         except:
             pass
+    search_files = glob('*.*')
+    for i in range(len(search_files)):
+        os.remove(search_files[i])
     os.chdir(first_path)
     os.rmdir(search)
     def rmodir(filePath):

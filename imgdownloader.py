@@ -12,6 +12,7 @@ import random
 import shutil
 from after_error import after_error
 from getpass import getuser
+from glob import glob
 
 user = getuser()
 first_path = f'C:\\Users\\{user}\\Pictures'
@@ -176,6 +177,10 @@ try:
             print(f'{percentage:<10}  -  {complete_time: .5} sec')
         except:
             pass
+    os.chdir(search)
+    search_files = glob('*.*')
+    for i in range(len(search_files)):
+        os.remove(search_files[i])
     os.chdir(first_path)
     os.rmdir(search)
     def rmodir(filePath):
