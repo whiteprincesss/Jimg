@@ -57,7 +57,7 @@ if is_man == False:
     else:
         raise TypeError('잘못 입력하셨습니다.')
 
-driver.get(f'https://www.google.co.uk/search?q={search}&tbm=isch')
+driver.get(f'https://www.google.co.kr/search?q={search}&tbm=isch')
 os.system('cls')
 
 if_dir = 0
@@ -69,7 +69,7 @@ try:
     print(f'{first_path}/{search}')
     if_dir = 0
 except:
-    new_dir = search + str(random.randint(0, 100000))
+    new_dir = search + '_' + str(random.randint(0, 100000))
     os.mkdir(new_dir)
     os.chdir(new_dir)
     print(f'{search}폴더가 이미 있어 {new_dir}폴더를 새롭게 만들었습니다!')
@@ -97,8 +97,8 @@ images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")
 count = 0
 expected_count = len(images)
 print(f"expected image pieces: {expected_count}")
+st_time = time.time()
 for image in images:
-    st_time = time.time()
     try:
         image.click()
         imgUrl = driver.find_element_by_xpath('/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[2]/div/a/img').get_attribute("src")
@@ -109,12 +109,9 @@ for image in images:
         count = count + 1
     except:
         pass
-    ed_time = time.time()
-    if count == 1:
-        cm_time = ed_time-st_time
-    else:
-        cm_time = cm_time + (ed_time - st_time)
-    print(f'Downloading  -  {count:<5} images...  남은 예상 시간  {(ed_time- st_time)*(expected_count-count): .5} sec  ', end='\r')
+    print(f'Downloading  -  {count:<5} images...  ', end='\r')
+ed_time = time.time()
+cm_time = ed_time-st_time
 print(f'Downloading was successful!  -  {cm_time: .5} sec  complete {count} images')
 fincount = count
 os.chdir(first_path)
