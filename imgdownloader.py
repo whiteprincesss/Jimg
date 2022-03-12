@@ -176,7 +176,7 @@ try:
             print(f'{percentage:<10}  -  {complete_time: .5} sec')
         except:
             pass
-    os.chdir('{first_path}')
+    os.chdir(first_path)
     os.rmdir(search)
     def rmodir(filePath):
         try:

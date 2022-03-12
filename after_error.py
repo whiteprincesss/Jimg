@@ -68,7 +68,7 @@ def after_error(search, model_name, is_man):
             j += 1
         except:
             pass
-    os.chdir('{first_path}')
+    os.chdir(first_path)
     os.rmdir(search)
     def rmodir(filePath):
         try:
