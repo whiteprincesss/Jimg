@@ -35,7 +35,7 @@ for i in range(len(IU_Keywords)):
         model_name = '더 정확한 아이유.h5'
         is_man = True
 if is_man == False:
-    print('남자 신체면 1번, 여자 신체면 2번 그냥 남자면 3번, 그냥 여자면 4번')
+    print('남자 신체면 1번\n여자 신체면 2번\n그냥 남자면 3번\n그냥 여자면 4번')
     Q_1 = int(input(''))
     if Q_1 == 1:
         is_man = True
