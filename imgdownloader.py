@@ -11,8 +11,10 @@ from PIL import Image, ImageOps
 import random
 import shutil
 from after_error import after_error
+from getpass import getuser
 
-first_path = os.getcwd()
+user = getuser()
+first_path = f'C:\\Users\\{user}\\Pictures'
 
 warnings.filterwarnings("ignore")
 chromedriver_autoinstaller.install()
@@ -26,28 +28,31 @@ search = str(input('Search: '))
 
 IU_Keywords = ['Iu', 'IU', '아이유', '안경유', 'iu', 'iU']
 
-is_iu = False
+is_man = False
 for i in range(len(IU_Keywords)):
     if IU_Keywords[i] in search:
         model = load_model('models/더 정확한 아이유.h5')
-        is_iu = True
-is_man = False
-is_man_body = False
-if is_iu == False:
+        model_name = '더 정확한 아이유.h5'
+        is_man = True
+if is_man == False:
     print('남자 신체면 1번, 여자 신체면 2번 그냥 남자면 3번, 그냥 여자면 4번')
     Q_1 = int(input(''))
     if Q_1 == 1:
-        is_man_body = True
+        is_man = True
         model = load_model('models/몸.h5')
+        model_name = '몸.h5'
     elif Q_1 == 2:
-        is_man_body = False
+        is_man = False
         model = load_model('models/몸.h5')
+        model_name = '몸.h5'
     elif Q_1 == 3:
         is_man = True
         model = load_model('models/남녀.h5')
+        model_name = '남녀.h5'
     elif Q_1 == 4:
         is_man = False
         model = load_model('models/남녀.h5')
+        model_name = '남녀.h5'
     else:
         raise TypeError('잘못 입력하셨습니다.')
 
@@ -118,36 +123,31 @@ else:
     os.mkdir(f'expected not {search}')
 try:
     for j in range(fincount):
-        start_time = time.time()
-        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-        # Replace this with the path to your image
-        image = Image.open(f'{first_path}/{search}/{j}.jpg')
-        #resize the image to a 224x224 with the same strategy as in TM2:
-        #resizing the image to be at least 224x224 and then cropping from the center
-        size = (224, 224)
-        image = ImageOps.fit(image, size, Image.ANTIALIAS)
+        try:
+            start_time = time.time()
+            data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+            # Replace this with the path to your image
+            image = Image.open(f'{first_path}/{search}/{j}.jpg')
+            #resize the image to a 224x224 with the same strategy as in TM2:
+            #resizing the image to be at least 224x224 and then cropping from the center
+            size = (224, 224)
+            image = ImageOps.fit(image, size, Image.ANTIALIAS)
 
-        #turn the image into a numpy array
-        image_array = np.asarray(image)
-        # Normalize the image
-        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-        # Load the image into the array
-        data[0] = normalized_image_array
+            #turn the image into a numpy array
+            image_array = np.asarray(image)
+            # Normalize the image
+            normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+            # Load the image into the array
+            data[0] = normalized_image_array
 
-        # run the inference
-        prediction = model.predict(data)
-        prediction = str(prediction)[2:-2].split()
-        first_prediction = round(float(prediction[0])*100, 2)
-        second_prediction = round(float(prediction[1])*100, 2)
-        
-        filename = '{}.jpg'.format(j)
-        src = f'{first_path}/{search}/'
-        if is_iu == True:
-            if first_prediction >= second_prediction:
-                dir = f'{first_path}/expected to {search}/'
-            else:
-                dir = f'{first_path}/expected not {search}/'
-        else:
+            # run the inference
+            prediction = model.predict(data)
+            prediction = str(prediction)[2:-2].split()
+            first_prediction = round(float(prediction[0])*100, 2)
+            second_prediction = round(float(prediction[1])*100, 2)
+            
+            filename = '{}.jpg'.format(j)
+            src = f'{first_path}/{search}/'
             if is_man == True:
                 if first_prediction >= second_prediction:
                     dir = f'{first_path}/expected to {search}/'
@@ -158,19 +158,21 @@ try:
                     dir = f'{first_path}/expected not {search}/'
                 else:
                     dir = f'{first_path}/expected to {search}/'
-        shutil.move(src+filename, dir+filename)
-        end_time = time.time()
-        global complete_time
-        if j == 0:
-            complete_time = end_time-start_time
-        else:
-            complete_time = complete_time + (end_time-start_time)
-        percentage = str(round((j+1)/fincount*100, 2))
-        if len(percentage.split('.')[1]) == 1:
-            percentage = percentage+'0'
-        else:
-            percentage = percentage
-        print(f'{percentage:<10}%  -  {complete_time: .5} sec')
+            shutil.move(src+filename, dir+filename)
+            end_time = time.time()
+            global complete_time
+            if j == 0:
+                complete_time = end_time-start_time
+            else:
+                complete_time = complete_time + (end_time-start_time)
+            percentage = str(round((j+1)/fincount*100, 2))
+            if len(percentage.split('.')[1]) == 1:
+                percentage = percentage+'0%'
+            else:
+                percentage = percentage + '%'
+            print(f'{percentage:<10}  -  {complete_time: .5} sec')
+        except:
+            pass
     os.chdir('{first_path}')
     os.rmdir(search)
     def rmodir(filePath):
@@ -191,5 +193,5 @@ try:
     for i in range(len(files)):
         os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
 except:
-    after_error(search)
+    after_error(search, model_name, is_man)
 driver.close()
