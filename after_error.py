@@ -6,11 +6,12 @@ from PIL import Image, ImageOps
 import shutil
 from getpass import getuser
 
+model_path = os.getcwd()
 user = getuser()
 first_path = f'C:\\Users\\{user}\\Pictures'
 
 def after_error(search, model_name, is_man):
-    model = load_model(f'models/{model_name}')
+    model = load_model(f'{model_path}/models/{model_name}')
     os.chdir(first_path)
     filelists = []
     filess = os.listdir(f'{search}/')
@@ -68,25 +69,22 @@ def after_error(search, model_name, is_man):
         except:
             pass
     os.chdir('{first_path}')
-    try:
-        os.rmdir(search)
-        def rmodir(filePath):
-            try:
-                for file in os.scandir(filePath):
-                    os.remove(file.path)
-                os.rmdir(filePath)
-            except:
-                pass
-        rmodir(f'expected not {search}')
-        os.rename(f'expected to {search}', search)
-        os.chdir(search)
-        filelist = []
-        files = os.listdir()
-        for i in range(len(files)):
-            filelist.append(int(files[i].split('.')[0]))
-        filelist.sort()
-        for i in range(len(files)):
-            os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
-    except:
-        pass
+    os.rmdir(search)
+    def rmodir(filePath):
+        try:
+            for file in os.scandir(filePath):
+                os.remove(file.path)
+            os.rmdir(filePath)
+        except:
+            pass
+    rmodir(f'expected not {search}')
+    os.rename(f'expected to {search}', search)
+    os.chdir(search)
+    filelist = []
+    files = os.listdir()
+    for i in range(len(files)):
+        filelist.append(int(files[i].split('.')[0]))
+    filelist.sort()
+    for i in range(len(files)):
+        os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
     return 'Done'
