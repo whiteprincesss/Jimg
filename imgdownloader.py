@@ -65,12 +65,14 @@ try:
     os.mkdir(search)
     os.chdir(search)
     print(f'{search}폴더를 새롭게 만들었습니다!')
+    print(f'{first_path}/{search}')
     if_dir = 0
 except:
     new_dir = search + str(random.randint(0, 100000))
     os.mkdir(new_dir)
     os.chdir(new_dir)
     print(f'{search}폴더가 이미 있어 {new_dir}폴더를 새롭게 만들었습니다!')
+    print(f'{first_path}/{new_dir}')
     if_dir = 1
 
 SCROLL_PAUSE_TIME = 1
