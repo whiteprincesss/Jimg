@@ -57,7 +57,7 @@ if is_man == False:
     else:
         raise TypeError('잘못 입력하셨습니다.')
 
-driver.get(f'https://www.google.co.kr/search?q={search}&tbm=isch')
+driver.get(f'https://www.google.co.uk/search?q={search}&tbm=isch')
 os.system('cls')
 
 if_dir = 0
