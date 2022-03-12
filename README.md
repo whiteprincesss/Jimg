@@ -8,5 +8,5 @@
 ## 설명
 #### imgdownloader는 AI를 구글에서 모든 이미지를 자동으로 다운 받습니다. AI를 사용하여 원하지 않는 이미지를 제거할 수 있습니다.
 
-## 개발자 연락처
-##### 이메일: <sciencelego1212@gmail.com>
+## 이메일
+##### <sciencelego1212@gmail.com>
