@@ -6,3 +6,5 @@
 # ignore files
 imgdownloader.spec
 ytdownloader.py
+iogindata.py
+testfile.py

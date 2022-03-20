@@ -25,7 +25,7 @@ options.add_argument("--disable-gpu")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(options=options)
 
-search = str(input('Search: '))
+search = input('Search: ')
 
 IU_Keywords = ['Iu', 'IU', '아이유', '안경유', 'iu', 'iU']
 
@@ -37,7 +37,7 @@ for i in range(len(IU_Keywords)):
         is_man = True
 if is_man == False:
     print('남자 신체면 1번\n여자 신체면 2번\n그냥 남자면 3번\n그냥 여자면 4번')
-    Q_1 = int(input(''))
+    Q_1 = int(input(': '))
     if Q_1 == 1:
         is_man = True
         model = load_model('models/몸.h5')
