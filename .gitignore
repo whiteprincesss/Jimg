@@ -4,7 +4,6 @@
 /dist/
 
 # ignore files
-imgdownloader.spec
 ytdownloader.py
-logindata.py
+logindata.txt
 testfile.py

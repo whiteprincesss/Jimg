@@ -8,9 +8,12 @@ import os
 import requests
 import warnings
 import random
-import logindata as ld
 from getpass import getuser
 from glob import glob
+
+ld = open('logindata.txt','r')
+data = ld.read().split(',')
+ld.close()
 
 user = getuser()
 first_path = f'C:\\Users\\{user}\\Pictures'
@@ -20,8 +23,8 @@ try:
 except:
     pass
 os.chdir('instagram')
-ID = ld.data['ID']
-PW = ld.data['PASSWORD']
+ID = data[0]
+PW = data[1]
 baseUrl = 'https://www.instagram.com/'
 plusUrl = input('검색할 계정를 입력하세요 : ')
 url = baseUrl + quote_plus(plusUrl)
