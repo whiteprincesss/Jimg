@@ -10,6 +10,7 @@ import warnings
 import random
 import logindata as ld
 from getpass import getuser
+from glob import glob
 
 user = getuser()
 first_path = f'C:\\Users\\{user}\\Pictures'
@@ -26,14 +27,20 @@ plusUrl = input('검색할 계정를 입력하세요 : ')
 url = baseUrl + quote_plus(plusUrl)
 
 try:
-    os.mkdir(plusUrl)
-    os.chdir(plusUrl)
+    folder = plusUrl
+    os.mkdir(folder)
 except:
     folder = plusUrl+str(random.randint(0,10000))
     os.mkdir(folder)
-    os.chdir(folder)
+os.chdir(folder)
 
 def dwl(search):
+    class NULLaccountError(Exception):
+        def __init__(self):
+            super().__init__('없는 계정입니다.')
+    class NULLuploadError(Exception):
+        def __init__(self):
+            super().__init__('계정에 게시물이 없습니다.')
     plusUrl = search
     warnings.filterwarnings("ignore")
     chromedriver_autoinstaller.install()
@@ -60,8 +67,13 @@ def dwl(search):
     html = driver.page_source
     soup = BeautifulSoup(html)
 
-    count = driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/ul/li[1]/div/span').text
-    count = int(count.replace(',',''))
+    try:
+        count = driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/ul/li[1]/div/span').text
+        count = int(count.replace(',',''))
+    except:
+        raise NULLaccountError
+    if count == 0:
+        raise NULLuploadError
 
     imglist = []
     for i in range(0, round(count/60)):
@@ -90,5 +102,8 @@ def dwl(search):
                 img = f.read()
                 h.write(img)
         n += 1
-    
+    if glob('*.*') == []:
+        f = open('Why this folder is empty.txt', 'w')
+        f.write('계정이 비공개로 추측 됩니다.')
+        f.close()
 dwl(plusUrl)
