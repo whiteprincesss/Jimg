@@ -1,4 +1,8 @@
 ## 수정 사항
+#### 2022.4.26
+ - 통합버전의 GUI추가
+ - GUI에 프로그래스 바 추가 예정
+
 #### 2022.4.25
  - imgdownloader와 instadownloader를 하나로 통합
 

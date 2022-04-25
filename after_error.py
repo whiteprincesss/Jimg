@@ -65,7 +65,6 @@ def after_error(search, model_name, is_man):
                 complete_time = end_time-start_time
             else:
                 complete_time = complete_time + (end_time-start_time)
-            print(f'{round((k+1)/fincount*100, 2)}%  -  {complete_time: .5} sec')
             j += 1
         except:
             pass

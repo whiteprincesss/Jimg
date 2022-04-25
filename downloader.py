@@ -1,3 +1,5 @@
+# GUI
+from tkinter import *
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 from selenium import webdriver
@@ -34,8 +36,7 @@ options.add_argument('--headless')
 options.add_argument("--disable-gpu")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-def googledownloader():
-    search = input('Search: ')
+def googledownloader(search):
     IU_Keywords = ['Iu', 'IU', '아이유', '안경유', 'iu', 'iU']
 
     is_man = False
@@ -45,32 +46,26 @@ def googledownloader():
             model_name = '더 정확한 아이유.h5'
             is_man = True
             break
+    # classify_mode
     if is_man == False:
-        while True:
-            print('남자 신체면 1번\n여자 신체면 2번\n그냥 남자면 3번\n그냥 여자면 4번')
-            Q_1 = int(input(': '))
-            if Q_1 == 1:
-                is_man = True
-                model = load_model('models/몸.h5')
-                model_name = '몸.h5'
-                break
-            elif Q_1 == 2:
-                is_man = False
-                model = load_model('models/몸.h5')
-                model_name = '몸.h5'
-                break
-            elif Q_1 == 3:
-                is_man = True
-                model = load_model('models/남녀.h5')
-                model_name = '남녀.h5'
-                break
-            elif Q_1 == 4:
-                is_man = False
-                model = load_model('models/남녀.h5')
-                model_name = '남녀.h5'
-                break
-            else:
-                raise TypeError('잘못 입력하셨습니다.')
+        if classify_mode == 1:
+            is_man = True
+            model = load_model('models/몸.h5')
+            model_name = '몸.h5'
+        elif classify_mode == 2:
+            is_man = False
+            model = load_model('models/몸.h5')
+            model_name = '몸.h5'
+        elif classify_mode == 3:
+            is_man = True
+            model = load_model('models/남녀.h5')
+            model_name = '남녀.h5'
+        elif classify_mode == 4:
+            is_man = False
+            model = load_model('models/남녀.h5')
+            model_name = '남녀.h5'
+        else:
+            raise TypeError('잘못 입력하셨습니다.')
     driver = webdriver.Chrome(options=options)
     driver.get(f'https://www.google.co.kr/search?q={search}&tbm=isch')
 
@@ -79,15 +74,11 @@ def googledownloader():
     try:
         os.mkdir(search)
         os.chdir(search)
-        print(f'{search}폴더를 새롭게 만들었습니다!')
-        print(f'{first_path}/{search}')
         if_dir = 0
     except:
         new_dir = search + '_' + str(random.randint(0, 100000))
         os.mkdir(new_dir)
         os.chdir(new_dir)
-        print(f'{search}폴더가 이미 있어 {new_dir}폴더를 새롭게 만들었습니다!')
-        print(f'{first_path}/{new_dir}')
         if_dir = 1
     os.system('cls')
     SCROLL_PAUSE_TIME = 1
@@ -105,7 +96,6 @@ def googledownloader():
 
     images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")
     count = 0
-    st_time = time.time()
     for image in images:
         try:
             image.click()
@@ -117,10 +107,6 @@ def googledownloader():
             count = count + 1
         except:
             pass
-        print(f'Downloading  -  {count:<5} images...  ', end='\r')
-    ed_time = time.time()
-    cm_time = ed_time-st_time
-    print(f'Downloading was successful!  -  {cm_time: .5} sec  complete {count} images')
     fincount = count
     os.chdir(first_path)
     if if_dir == 0:
@@ -170,7 +156,6 @@ def googledownloader():
                     percentage = percentage+'0%'
                 else:
                     percentage = percentage + '%'
-                print(f'{percentage:<10}  -  {complete_time: .5} sec')
             except:
                 pass
         os.chdir(search)
@@ -198,12 +183,11 @@ def googledownloader():
             os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
     except:
         after_error(search, model_name, is_man)
-    print('Finish')
     driver.close()
-
-def instadownlader():
+    return "Finish"
+    
+def instadownlader(plusUrl):
     baseUrl = 'https://www.instagram.com/'
-    plusUrl = input('검색할 계정를 입력하세요 : ')
     url = baseUrl + quote_plus(plusUrl)
     def dwl(search):
         try:
@@ -224,7 +208,7 @@ def instadownlader():
                 driver.find_element_by_css_selector("#loginForm > div > div:nth-child(3) > button > div").click()
                 time.sleep(3)
                 try:
-                    driver.find_element_by_css_selector("#react-root > section > main > div > div > div > section > div > button").click()
+                    driver.find_element_by_css_selector("#react-google > section > main > div > div > div > section > div > button").click()
                 except:
                     driver.close()
                 time.sleep(3)
@@ -242,7 +226,7 @@ def instadownlader():
             if count == 0:
                 raise NULLuploadError
             try:
-                name = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/div/header/section/div[2]/span').text
+                name = driver.find_element_by_xpath('//*[@id="react-google"]/section/main/div/header/section/div[2]/span').text
             except:
                 name = plusUrl
             try:
@@ -289,7 +273,6 @@ def instadownlader():
                         except:
                             break
                     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    print(f'스크롤 중... try:{j}')
                     j += 1
                 except:
                     break
@@ -302,31 +285,117 @@ def instadownlader():
                     with open(plusUrl +'-'+str(n) + '.jpg', 'wb') as h:
                         img = f.read()
                         h.write(img)
-                print(f'downloading...  {str(round((n+1)/count*100 ,2))}%')
                 n += 1
             print('download completed!')
             if glob('*.*') == []:
                 os.chdir('..')
                 os.rmdir(folder)
-                print("비공개 계정인거 같아요!")
+                driver.close()
         except:
+            try:
+                driver.close()
+            except:
+                pass
             dwl(plusUrl)
     dwl(plusUrl)
+    return 'Finish'
 
-while True:
-    print("""
-    ========================Image Downloader========================
-                    1. Download image in google
-                    2. Download image in instagram
-    ================================================================
-        """)
-    search_browser = input('Enter number: No.')
-    if search_browser == '1':
-        googledownloader()
-        break
-    elif search_browser == '2':
-        instadownlader()
-        break
-    else:
-        print('Try again')
+# 구글 다운로더
+def google_func():
+    google = Tk()
+    google.title('Downloader')
+    google.geometry('640x720+700+150')
+    google.resizable(False,False)
+
+    Label(google, text="GOOGLE DOWNLOADER", font=60).pack(pady=10)
+
+    # Entry 검색창
+    search_txt = Entry(google, width=30)
+    search_txt.place(x=210,y=60)
+    search_txt.insert(0, 'Search')
+
+    Label(google, text='분류 모델', font=40).place(x=280,y=100)
+
+    # radio button - classify mode
+    classify_var = IntVar()
+    btn_manbody = Radiobutton(google, text='남자 신체', value=1, variable=classify_var)
+    btn_womanbody = Radiobutton(google, text='여자 신체', value=2, variable=classify_var)
+    btn_man = Radiobutton(google, text='남자', value=3, variable=classify_var)
+    btn_woman = Radiobutton(google, text='여자', value=4, variable=classify_var)
+    btn_womanbody.select()
+
+    btn_manbody.place(x=265,y=130)
+    btn_womanbody.place(x=265,y=150)
+    btn_man.place(x=265,y=170)
+    btn_woman.place(x=265,y=190)
+
+    # 검색 함수
+    def search_image():
+        global search_word
+        global classify_mode
+        search_word = str(search_txt.get())
+        classify_mode = int(classify_var.get())
+        function = googledownloader(search_word)
+        if function == 'Finish':
+            print('Finished!')
+
+    # 검색 버튼
+    Button(google, text="Search", command=search_image).place(x=295,y=220)
+
+    google.mainloop()
     
+# 인스타 다운로더
+def insta_func():
+    insta = Tk()
+    insta.title('Downloader')
+    insta.geometry('640x720+700+150')
+    insta.resizable(False,False)
+
+    Label(insta, text="INSTAGRAM DOWNLOADER", font=60).pack(pady=10)
+
+    # Entry 검색창
+    search_txt = Entry(insta, width=30)
+    search_txt.place(x=210,y=60)
+    search_txt.insert(0, 'Search')
+
+    # 검색 함수
+    def search_image():
+        global search_word
+        search_word = str(search_txt.get())
+        function = instadownlader(search_word)
+        if function == 'Finish':
+            print('Finished!')
+
+    # 검색 버튼
+    Button(insta, text="Search", command=search_image).place(x=295,y=90)
+
+    insta.mainloop()
+
+# 모드 선택 창
+default = Tk()
+default.title('Downloader')
+default.geometry("300x150+900+400")
+default.resizable(False,False)
+
+Label(default, text='Downloader', font=40).pack(pady=5)
+
+# radio 값을 가져오는 함수
+def check_radio():
+    default.destroy()
+    if int(mode_var.get()) == 1:
+        google_func()
+    elif int(mode_var.get()) == 2:
+        insta_func()
+
+# radio button - search mode
+mode_var = IntVar()
+btn_google = Radiobutton(default, text='Download image in google', value=1, variable=mode_var)
+btn_insta = Radiobutton(default, text='Download image in instagram', value=2, variable=mode_var)
+btn_google.select()
+
+btn_google.place(x=60,y=35)
+btn_insta.place(x=60,y=55)
+
+Button(default, text='선택', command=check_radio).place(x=130,y=90)
+
+default.mainloop()
