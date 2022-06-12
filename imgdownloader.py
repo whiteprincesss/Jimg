@@ -75,6 +75,7 @@ def googledownloader():
     driver.get(f'https://www.google.co.kr/search?q={search}&tbm=isch')
 
     if_dir = 0
+    os.system('cls')
     os.chdir(first_path)
     try:
         os.mkdir(search)
@@ -87,9 +88,8 @@ def googledownloader():
         os.mkdir(new_dir)
         os.chdir(new_dir)
         print(f'{search}폴더가 이미 있어 {new_dir}폴더를 새롭게 만들었습니다!')
-        print(f'{first_path}/{new_dir}')
+        print(f'{first_path}\{new_dir}')
         if_dir = 1
-    os.system('cls')
     SCROLL_PAUSE_TIME = 1
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
@@ -99,7 +99,9 @@ def googledownloader():
         if new_height == last_height:
             try:
                 driver.find_elements_by_css_selector(".mye4qd").click()
+                print('Scroll')
             except:
+                print('Scroll Finish')
                 break
         last_height = new_height
 
@@ -109,7 +111,7 @@ def googledownloader():
     for image in images:
         try:
             image.click()
-            imgUrl = driver.find_element_by_xpath('/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[2]/div/a/img').get_attribute("src")
+            imgUrl = driver.find_element_by_xpath('//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[3]/div/a/img').get_attribute("src")
             opener=urllib.request.build_opener()
             opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
             urllib.request.install_opener(opener)
@@ -170,7 +172,7 @@ def googledownloader():
                     percentage = percentage+'0%'
                 else:
                     percentage = percentage + '%'
-                print(f'{percentage:<10}  -  {complete_time: .5} sec')
+                print(f'{percentage:<10}  -  {complete_time: .5} sec', end='\r')
             except:
                 pass
         os.chdir(search)
@@ -198,6 +200,7 @@ def googledownloader():
             os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
     except:
         after_error(search, model_name, is_man)
+    print('\t\t\t\t')
     print('Finish')
     driver.close()
 

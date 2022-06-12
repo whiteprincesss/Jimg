@@ -1,6 +1,7 @@
 # GUI
 from tkinter import *
 from urllib.request import urlopen
+import tkinter.ttk as ttk
 from urllib.parse import quote_plus
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -74,6 +75,7 @@ def googledownloader(search):
     try:
         os.mkdir(search)
         os.chdir(search)
+        new_dir = search
         if_dir = 0
     except:
         new_dir = search + '_' + str(random.randint(0, 100000))
@@ -81,6 +83,7 @@ def googledownloader(search):
         os.chdir(new_dir)
         if_dir = 1
     os.system('cls')
+    print(f'{first_path}\{new_dir}')
     SCROLL_PAUSE_TIME = 1
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
@@ -99,7 +102,7 @@ def googledownloader(search):
     for image in images:
         try:
             image.click()
-            imgUrl = driver.find_element_by_xpath('/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[2]/div/a/img').get_attribute("src")
+            imgUrl = driver.find_element_by_xpath('//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[3]/div/a/img').get_attribute("src")
             opener=urllib.request.build_opener()
             opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
             urllib.request.install_opener(opener)
@@ -117,9 +120,12 @@ def googledownloader(search):
         os.mkdir(f'expected to {search}')
         os.mkdir(f'expected not {search}')
     try:
+        tempprg = Tk()
+        p_var = DoubleVar()
+        prograssbar = ttk.Progressbar(tempprg, maximum=fincount, variable=p_var)
+        prograssbar.pack()
         for j in range(fincount):
             try:
-                start_time = time.time()
                 data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
                 image = Image.open(f'{first_path}/{search}/{j}.jpg')
                 size = (224, 224)
@@ -145,19 +151,11 @@ def googledownloader(search):
                     else:
                         dir = f'{first_path}/expected to {search}/'
                 shutil.move(src+filename, dir+filename)
-                end_time = time.time()
-                global complete_time
-                if j == 0:
-                    complete_time = end_time-start_time
-                else:
-                    complete_time = complete_time + (end_time-start_time)
-                percentage = str(round((j+1)/fincount*100, 2))
-                if len(percentage.split('.')[1]) == 1:
-                    percentage = percentage+'0%'
-                else:
-                    percentage = percentage + '%'
+                p_var.set(j)
+                prograssbar.update()
             except:
                 pass
+        tempprg.mainloop()
         os.chdir(search)
         search_files = glob('*.*')
         for i in range(len(search_files)):
@@ -276,26 +274,19 @@ def instadownlader(plusUrl):
                     j += 1
                 except:
                     break
-            print('downloade start')
             n = 0
             insta = soup.select('.v1Nh3.kIKUG._bz0w')
             for i in imglist:
                 imgUrl = imglist[n]
                 with urlopen(imgUrl) as f:
                     with open(plusUrl +'-'+str(n) + '.jpg', 'wb') as h:
-                        img = f.read()
+                        img = f.rdownloader.pyead()
                         h.write(img)
                 n += 1
-            print('download completed!')
             if glob('*.*') == []:
                 os.chdir('..')
                 os.rmdir(folder)
-                driver.close()
         except:
-            try:
-                driver.close()
-            except:
-                pass
             dwl(plusUrl)
     dwl(plusUrl)
     return 'Finish'
@@ -318,16 +309,18 @@ def google_func():
 
     # radio button - classify mode
     classify_var = IntVar()
+    btn_IU = Radiobutton(google, text='아이유', value=0, variable=classify_var)
     btn_manbody = Radiobutton(google, text='남자 신체', value=1, variable=classify_var)
     btn_womanbody = Radiobutton(google, text='여자 신체', value=2, variable=classify_var)
     btn_man = Radiobutton(google, text='남자', value=3, variable=classify_var)
     btn_woman = Radiobutton(google, text='여자', value=4, variable=classify_var)
-    btn_womanbody.select()
+    btn_IU.select()
 
-    btn_manbody.place(x=265,y=130)
-    btn_womanbody.place(x=265,y=150)
-    btn_man.place(x=265,y=170)
-    btn_woman.place(x=265,y=190)
+    btn_IU.place(x=265,y=130)
+    btn_manbody.place(x=265,y=150)
+    btn_womanbody.place(x=265,y=170)
+    btn_man.place(x=265,y=190)
+    btn_woman.place(x=265,y=210)
 
     # 검색 함수
     def search_image():
@@ -340,7 +333,7 @@ def google_func():
             print('Finished!')
 
     # 검색 버튼
-    Button(google, text="Search", command=search_image).place(x=295,y=220)
+    Button(google, text="Search", command=search_image).place(x=295,y=240)
 
     google.mainloop()
     
@@ -352,6 +345,8 @@ def insta_func():
     insta.resizable(False,False)
 
     Label(insta, text="INSTAGRAM DOWNLOADER", font=60).pack(pady=10)
+
+    Label(insta, text="ID: ").place(x=185, y=60)
 
     # Entry 검색창
     search_txt = Entry(insta, width=30)

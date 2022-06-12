@@ -4,9 +4,10 @@
 /dist/
 
 # ignore files
-ytdownloader.py
 logindata.txt
 testfile.py
-logad.txt
+d.txt
 imgdownloadergui.py
 instagramdownloader.py
+iplocation.py
+testimgdw.py
