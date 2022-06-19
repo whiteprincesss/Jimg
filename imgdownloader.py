@@ -105,6 +105,7 @@ def googledownloader():
                 break
         last_height = new_height
 
+#법ㅎ
     images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")
     count = 0
     st_time = time.time()
