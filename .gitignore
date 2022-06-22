@@ -2,7 +2,6 @@
 /__pycache__/
 /build/
 /dist/
-/Songs/
 
 # ignore files
 logindata.txt
