@@ -12,7 +12,7 @@
 ## 수정 사항
 #### 2022.6.23
  - ytdownloader를 Jmusic으로 개편 후 새로운 프로젝트로 이동
- - 새로운 링크: [Jmusic][https://github.com/leejuneyeol/Jmusic, "Jmusic으로"]
+ - Jmusic 링크: [Jmusic](https://github.com/leejuneyeol/Jmusic, "Jmusic으로")
 
 #### 2022.6.13
  - ytdownloader 추가
