@@ -2,14 +2,16 @@
 
 ## 현재 오류 및 추가할 것
 #### 오류
- - 인스타에 여러번 로그인하면 다운 안됨
- - instadownloader에 로그인 안되는 오류
+ - 
 
 #### 추가할 것
- - 프로그래스바
- - imgdownloader, instadownloader를 하나의 GUI로 통합 예정
+ - 
 
 ## 수정 사항
+#### 2022.9.11
+ - instadownloader 개발 중단
+ - imgdownloader의 gui버전 개발 중단
+
 #### 2022.6.23
  - ytdownloader를 Jmusic으로 개편 후 새로운 프로젝트로 이동
  - [Jmusic](https://github.com/leejuneyeol/Jmusic "Jmusic으로")
