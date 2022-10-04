@@ -12,20 +12,20 @@ from bs4 import BeautifulSoup
 from PIL import Image, ImageOps
 import random
 import shutil
-from after_error import after_error
 from getpass import getuser
 from glob import glob
 import re
 from keras.models import load_model
 
-ld = open('logindata.txt','r')
-data = ld.read().split(',')
-ld.close()
-reg = re.compile(r'[가-힣a-zA-Z]')
-ID = data[0]
-PW = data[1]
 user = getuser()
-first_path = f'C:\\Users\\{user}\\Pictures'
+if not os.path.isfile('imgdown_setting.txt'):
+    f = open('imgdown_setting.txt', 'w')
+    f.write(f'C:\\Users\\{user}\\Pictures')
+    f.close()
+r = open('imgdown_setting.txt','r')
+check_path = r.readline()
+r.close()
+first_path = check_path
 
 warnings.filterwarnings("ignore")
 chromedriver_autoinstaller.install()
@@ -38,6 +38,14 @@ print('='*30)
 search = input('Search: ')
 IU_Keywords = ['Iu', 'IU', '아이유', '안경유', 'iu', 'iU']
 
+def convert_time(time):
+    time = float(time)
+    hour = int(time//3600)
+    left_time = round(time%3600, 2)
+    min = int(left_time//60)
+    sec = round(left_time%60, 2)
+    return (hour, min, sec)
+    
 def change_location():
     driver.get(f'https://www.google.com/preferences')
     SCROLL_PAUSE_SEC = 1
@@ -60,57 +68,77 @@ is_man = False
 is_woman = False
 for i in range(len(IU_Keywords)):
     if IU_Keywords[i] in search:
-        model = load_model('models/더 정확한 아이유.h5')
-        model_name = '더 정확한 아이유.h5'
+        model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\아이유V2.h5')
+        model_name = '아이유 ver.2'
         is_iu = True
         break
-if is_man == False:
+if is_iu == False:
     while True:
         print('남자 신체면 1번\n여자 신체면 2번\n그냥 남자면 3번\n그냥 여자면 4번\n그 외의 것이면 5번')
         Q_1 = int(input(': '))
         if Q_1 == 1:
             is_man = True
             is_woman = False
-            model = load_model('models/더 정확한 몸.h5')
-            model_name = '몸.h5'
+            model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\몸V2.h5')
+            model_name = '몸 ver.2'
             break
         elif Q_1 == 2:
             is_man = False
             is_woman = True
-            model = load_model('models/더 정확한 몸.h5')
-            model_name = '몸.h5'
+            model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\몸V2.h5')
+            model_name = '몸 ver.2'
             break
         elif Q_1 == 3:
             is_man = True
             is_woman = False
-            model = load_model('models/남녀.h5')
-            model_name = '남녀.h5'
+            model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\남녀.h5')
+            model_name = '남녀'
             break
         elif Q_1 == 4:
             is_man = False
             is_woman = True
-            model = load_model('models/남녀.h5')
-            model_name = '남녀.h5'
+            model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\남녀.h5')
+            model_name = '남녀'
             break
         elif Q_1 == 5:
             is_man = False
             is_woman = False
-            model = load_model('models/더 정확한 몸.h5')
+            model = load_model(r'C:\Users\junyeol\Desktop\imgdownloader\models\몸V2.h5')
+            model_name = '몸 ver.2'
         else:
             raise TypeError('잘못 입력하셨습니다.')
 driver = webdriver.Chrome(options=options)
-if model_name == '몸.h5':
+if model_name == '몸 ver.2':
     change_location()
 driver.get(f'https://www.google.com/search?q={search}&tbm=isch')
 
 if_dir = 0
 os.system('cls')
-os.chdir(first_path)
+try:
+    os.chdir(first_path)
+except FileNotFoundError:
+    print('********************************오류********************************')
+    print('존재하지 않는 폴더입니다.\n기본 폴더로 설정을 변경합니다.')
+    f = open('imgdown_setting.txt', 'w')
+    f.write(f'C:\\Users\\{user}\\Pictures')
+    first_path = f'C:\\Users\\{user}\\Pictures'
+    f.close()
+    os.chdir(first_path)
 try:
     os.mkdir(search)
     os.chdir(search)
+    print('================================================기본 정보================================================')
     print(f'{search}폴더를 새롭게 만들었습니다!')
-    print(f'{first_path}/{search}')
+    print(f'{first_path}\{search}')
+    print(f'Selected model: {model_name}')
+    if is_iu == True:
+        print('Selected Mode: 아이유')
+    elif is_man == True:
+        print('Selected Mode: 남자')
+    elif is_woman == True:
+        print('Selected Mode: 여자')
+    else:
+        print('Selected Mode: 기타')
     if_dir = 0
 except:
     new_dir = search + '_' + str(random.randint(0, 100000))
@@ -134,8 +162,8 @@ while True:
             break
     last_height = new_height
 
-#법ㅎ
 images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")
+print(len(images))
 count = 0
 st_time = time.time()
 for image in images:
@@ -149,10 +177,11 @@ for image in images:
         count = count + 1
     except:
         pass
-    print(f'Downloading  -  {count:<5} images...  ', end='\r')
+    print('\033[38;2;99;247;249m' + f'다운로드 현황  {count:<5}개' + '\033[0m', end='\r')
 ed_time = time.time()
-cm_time = ed_time-st_time
-print(f'Downloading was successful!  -  {cm_time: .5} sec  complete {count} images')
+cm_time = round(ed_time-st_time, 2)
+during_time = convert_time(cm_time)
+print('다운로드 완료!' + '\033[38;2;99;247;249m' + f'    평균 {round(count/cm_time, 2)}초' + f'...{count}개 다운 완료  ...총 {during_time[0]}시간 {during_time[1]}분 {during_time[2]}초 소요됨' + '\033[0m')
 fincount = count
 os.chdir(first_path)
 if if_dir == 0:
@@ -163,32 +192,50 @@ else:
     os.mkdir(f'expected to {search}')
     os.mkdir(f'expected not {search}')
 if is_iu == False:
-    try:
-        for j in range(fincount):
-            try:
-                start_time = time.time()
-                data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-                image = Image.open(f'{first_path}/{search}/{j}.jpg')
-                size = (224, 224)
-                image = ImageOps.fit(image, size, Image.ANTIALIAS)
-                image_array = np.asarray(image)
-                normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-                data[0] = normalized_image_array
-                prediction = model.predict(data)
-                prediction = str(prediction)[2:-2].split()
+    for j in range(fincount):
+        try:
+            start_time = time.time()
+            data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+            image = Image.open(f'{first_path}/{search}/{j}.jpg')
+            size = (224, 224)
+            image = ImageOps.fit(image, size, Image.ANTIALIAS)
+            image_array = np.asarray(image)
+            normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+            data[0] = normalized_image_array
+            prediction = model.predict(data)
+            prediction = str(prediction)[2:-2].split()
+            if len(prediction) == 2:
+                first_prediction = round(float(prediction[0])*100, 2)
+                second_prediction = round(float(prediction[1])*100, 2)
+            else:
                 first_prediction = round(float(prediction[0])*100, 2)
                 second_prediction = round(float(prediction[1])*100, 2)
                 last_prediction = round(float(prediction[2])*100, 2)
-                
-                total_predictions = []
-                total_predictions.append(first_prediction)
-                total_predictions.append(second_prediction)
+            
+            total_predictions = []
+            total_predictions.append(first_prediction)
+            total_predictions.append(second_prediction)
+            if len(prediction) == 2:
+                pass
+            else:
                 total_predictions.append(last_prediction)
-                
-                max_predictions = max(total_predictions)
-                
-                filename = '{}.jpg'.format(j)
-                src = f'{first_path}/{search}/'
+            
+            max_predictions = max(total_predictions)
+            
+            filename = '{}.jpg'.format(j)
+            src = f'{first_path}/{search}/'
+            if model_name == '남녀':
+                if is_man == True:
+                    if max_predictions == first_prediction:
+                        dir = f'{first_path}/expected to {search}/'
+                    else:
+                        dir = f'{first_path}/expected not {search}/'
+                elif is_woman == True:
+                    if max_predictions == second_prediction:
+                        dir = f'{first_path}/expected to {search}/'
+                    else:
+                        dir = f'{first_path}/expected not {search}/'
+            else:
                 if is_man == True:
                     if max_predictions == first_prediction:
                         dir = f'{first_path}/expected to {search}/'
@@ -204,46 +251,21 @@ if is_iu == False:
                         dir = f'{first_path}/expected not {search}/'
                     else:
                         dir = f'{first_path}/expected to {search}/'
-                shutil.move(src+filename, dir+filename)
-                end_time = time.time()
-                global complete_time
-                if j == 0:
-                    complete_time = end_time-start_time
-                else:
-                    complete_time = complete_time + (end_time-start_time)
-                percentage = str(round((j+1)/fincount*100, 2))
-                if len(percentage.split('.')[1]) == 1:
-                    percentage = percentage+'0%'
-                else:
-                    percentage = percentage + '%'
-                print(f'{percentage:<10}  -  {complete_time: .5} sec', end='\r')
-            except:
-                pass
-        os.chdir(search)
-        search_files = glob('*.*')
-        for i in range(len(search_files)):
-            os.remove(search_files[i])
-        os.chdir(first_path)
-        os.rmdir(search)
-        def rmodir(filePath):
-            try:
-                for file in os.scandir(filePath):
-                    os.remove(file.path)
-                os.rmdir(filePath)
-            except:
-                pass
-        rmodir(f'expected not {search}')
-        os.rename(f'expected to {search}', search)
-        os.chdir(search)
-        filelist = []
-        files = os.listdir()
-        for i in range(len(files)):
-            filelist.append(int(files[i].split('.')[0]))
-        filelist.sort()
-        for i in range(len(files)):
-            os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
-    except:
-        after_error(search, model_name, is_man)
+            shutil.move(src+filename, dir+filename)
+            end_time = time.time()
+            global complete_time
+            if j == 0:
+                complete_time = end_time-start_time
+            else:
+                complete_time = complete_time + (end_time-start_time)
+            percentage = str(round((j+1)/fincount*100, 2))
+            if len(percentage.split('.')[1]) == 1:
+                percentage = percentage+'0%'
+            else:
+                percentage = percentage + '%'
+            print(f'{percentage:<10}  -  {complete_time: .5} sec', end='\r')
+        except ValueError:
+            pass
 elif is_iu == True:
     try:
         for j in range(fincount):
@@ -287,32 +309,31 @@ elif is_iu == True:
                 print(f'{percentage:<10}  -  {complete_time: .5} sec', end='\r')
             except:
                 pass
-        os.chdir(search)
-        search_files = glob('*.*')
-        for i in range(len(search_files)):
-            os.remove(search_files[i])
-        os.chdir(first_path)
-        os.rmdir(search)
-        def rmodir(filePath):
-            try:
-                for file in os.scandir(filePath):
-                    os.remove(file.path)
-                os.rmdir(filePath)
-            except:
-                pass
-        rmodir(f'expected not {search}')
-        os.rename(f'expected to {search}', search)
-        os.chdir(search)
-        filelist = []
-        files = os.listdir()
-        for i in range(len(files)):
-            filelist.append(int(files[i].split('.')[0]))
-        filelist.sort()
-        for i in range(len(files)):
-            os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
     except:
-        after_error(search, model_name, is_man)
-print('\t\t\t\t')
-print('Finish')
+        print('오류 발생!')
+os.chdir(search)
+search_files = glob('*.*')
+for i in range(len(search_files)):
+    os.remove(search_files[i])
+os.chdir(first_path)
+os.rmdir(search)
+def rmodir(filePath):
+    try:
+        for file in os.scandir(filePath):
+            os.remove(file.path)
+        os.rmdir(filePath)
+    except:
+        pass
+rmodir(f'expected not {search}')
+os.rename(f'expected to {search}', search)
+os.chdir(search)
+filelist = []
+files = os.listdir()
+for i in range(len(files)):
+    filelist.append(int(files[i].split('.')[0]))
+filelist.sort()
+for i in range(len(files)):
+    os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
+    final_num = i+1
+print(f'완료!\n총 {final_num}개 다운 됨')
 driver.close()
-    
