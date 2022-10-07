@@ -107,10 +107,11 @@ if is_iu == False:
             model_name = '몸 ver.2'
         else:
             raise TypeError('잘못 입력하셨습니다.')
+st_time = time.time()
 driver = webdriver.Chrome(options=options)
 if model_name == '몸 ver.2':
     change_location()
-driver.get(f'https://www.google.com/search?q={search}&tbm=isch')
+driver.get(f'https://www.google.com/search?as_st=y&tbm=isch&hl=ko&as_q={search}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=itp:photo')
 
 if_dir = 0
 os.system('cls')
@@ -132,7 +133,7 @@ try:
     print(f'{first_path}\{search}')
     print(f'Selected model: {model_name}')
     if is_iu == True:
-        print('Selected Mode: 아이유')
+        pass
     elif is_man == True:
         print('Selected Mode: 남자')
     elif is_woman == True:
@@ -163,9 +164,7 @@ while True:
     last_height = new_height
 
 images = driver.find_elements_by_css_selector(".rg_i.Q4LuWd")
-print(len(images))
 count = 0
-st_time = time.time()
 for image in images:
     try:
         image.click()
@@ -178,10 +177,7 @@ for image in images:
     except:
         pass
     print('\033[38;2;99;247;249m' + f'다운로드 현황  {count:<5}개' + '\033[0m', end='\r')
-ed_time = time.time()
-cm_time = round(ed_time-st_time, 2)
-during_time = convert_time(cm_time)
-print('다운로드 완료!' + '\033[38;2;99;247;249m' + f'    평균 {round(count/cm_time, 2)}초' + f'...{count}개 다운 완료  ...총 {during_time[0]}시간 {during_time[1]}분 {during_time[2]}초 소요됨' + '\033[0m')
+print('다운로드 완료!' + '\033[38;2;99;247;249m' + f'...{count}개 다운 완료' + '\033[0m')
 fincount = count
 os.chdir(first_path)
 if if_dir == 0:
@@ -326,6 +322,25 @@ def rmodir(filePath):
         pass
 rmodir(f'expected not {search}')
 os.rename(f'expected to {search}', search)
+print(f'\t\t\t\t\t')
+print("필터링 시작")
+filtered_count = 0
+for index, file_name in enumerate(os.listdir(search)):
+    try:
+        file_path = os.path.join(search, file_name)
+        img = Image.open(file_path)
+        # 이미지 해상도의 가로와 세로가 모두 350이하인 경우
+        if img.width < 351 and img.height < 351:
+            img.close()
+            os.remove(file_path)
+            filtered_count += 1
+        else:
+            img.close()
+    # 이미지 파일이 깨져있는 경우
+    except OSError:
+        os.remove(file_path)
+        filtered_count += 1
+print(f'삭제한 파일 개수: {filtered_count}개')
 os.chdir(search)
 filelist = []
 files = os.listdir()
@@ -335,5 +350,10 @@ filelist.sort()
 for i in range(len(files)):
     os.rename(str(filelist[i])+'.jpg', f'{i}.jpg')
     final_num = i+1
+print(f'\t\t\t\t\t')
 print(f'완료!\n총 {final_num}개 다운 됨')
+ed_time = time.time()
+during_time = round(ed_time-st_time, 2)
+during_time = convert_time(during_time)
+print(f'총 시간: {during_time[0]}시간 {during_time[1]}분 {during_time[2]}초')
 driver.close()
