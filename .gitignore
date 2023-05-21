@@ -2,6 +2,7 @@
 /__pycache__/
 /build/
 /dist/
+/.vscode/
 
 # ignore files
 logindata.txt

@@ -1,14 +1,12 @@
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import time
 import urllib.request
 import chromedriver_autoinstaller
 import os
 import warnings
 import numpy as np
-from bs4 import BeautifulSoup
 from PIL import Image, ImageOps
 import random
 import shutil
@@ -17,6 +15,16 @@ from glob import glob
 import re
 from keras.models import load_model
 from selenium.webdriver.common.by import By
+
+# 모델 변수
+model_iu = load_model('models\iu.h5')
+model_nsfw = load_model('models//nsfw.h5')
+model_gender = model = load_model('models\gender.h5')
+
+#모델 버전
+version_iu = '2.0'
+version_nsfw = '1.1'
+version_gender = '1.1'
 
 user = getuser()
 if not os.path.isfile('imgdown_setting.txt'):
@@ -38,6 +46,7 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 print('='*30)
 search = input('Search: ')
 IU_Keywords = ['Iu', 'IU', '아이유', '안경유', 'iu', 'iU']
+yuna_Keywords = []
 
 def convert_time(time):
     time = float(time)
@@ -70,8 +79,8 @@ try:
     is_woman = False
     for i in range(len(IU_Keywords)):
         if IU_Keywords[i] in search:
-            model = load_model(f'models\아이유V2.h5')
-            model_name = '아이유 ver.2'
+            model = model_iu
+            model_name = 'iu'
             is_iu = True
             break
     if is_iu == False:
@@ -82,42 +91,42 @@ try:
                 if search[-1] == '&':
                     is_man = True
                     is_woman = False
-                    model = load_model(r'models\몸V2.h5')
-                    model_name = '몸 ver.2'
+                    model = model_nsfw
+                    model_name = 'nsfw'
                     search = search[:-1]
                     break
                 else:
                     is_man = True
                     is_woman = False
-                    model = load_model(r'models\남녀.h5')
-                    model_name = '남녀'
+                    model = model_gender
+                    model_name = 'gender'
                     break
             elif Q_1 == 2:
                 if search[-1] == '&':
                     is_man = False
                     is_woman = True
-                    model = load_model(r'models\몸V2.h5')
-                    model_name = '몸 ver.2'
+                    model = model_nsfw
+                    model_name = 'nsfw'
                     search = search[:-1]
                     break
                 else:
                     is_man = False
                     is_woman = True
-                    model = load_model(r'models\남녀.h5')
-                    model_name = '남녀'
+                    model = model_gender
+                    model_name = 'gender'
                     break
             elif Q_1 == 3:
                 is_man = False
                 is_woman = False
-                model = load_model(r'models\몸V2.h5')
-                model_name = '몸 ver.2'
+                model = model_nsfw
+                model_name = 'nsfw'
             else:
                 raise TypeError('잘못 입력하셨습니다.')
     st_time = time.time()
     driver = webdriver.Chrome(options=options)
-    if model_name == '몸 ver.2':
+    if model_name == 'nsfw':
         change_location()
-    driver.get(f'https://www.google.com/search?as_st=y&tbm=isch&hl=ko&as_q={search}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=itp:photo')
+    driver.get(f'https://www.google.com/search?as_st=y&tbm=isch&hl=ko&as_q={search+" 고화질"}&as_epq=&as_oq=&as_eq=&cr=&as_sitesearch=&safe=images&tbs=itp:photo')
 
     if_dir = 0
     os.system('cls')
@@ -175,7 +184,8 @@ try:
     for image in images:
         try:
             image.click()
-            imgUrl = driver.find_element(By.XPATH, '//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div[3]/div/a/img').get_attribute("src")
+            time.sleep(0.2)
+            imgUrl = driver.find_element(By.XPATH, '/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div[2]/div/div[2]/div[2]/div[2]/c-wiz/div/div/div/div[3]/div[1]/a/img[1]').get_attribute("src")
             opener=urllib.request.build_opener()
             opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
             urllib.request.install_opener(opener)
@@ -227,7 +237,7 @@ try:
                 
                 filename = '{}.jpg'.format(j)
                 src = f'{first_path}/{search}/'
-                if model_name == '남녀':
+                if model_name == 'gender':
                     if is_man == True:
                         if max_predictions == first_prediction:
                             dir = f'{first_path}/expected to {search}/'
@@ -295,9 +305,9 @@ try:
                     filename = '{}.jpg'.format(j)
                     src = f'{first_path}/{search}/'
                     if max_predictions == first_prediction:
-                        dir = f'{first_path}/expected not {search}/'
-                    else:
                         dir = f'{first_path}/expected to {search}/'
+                    else:
+                        dir = f'{first_path}/expected not {search}/'
                     shutil.move(src+filename, dir+filename)
                     end_time = time.time()
                     if j == 0:
@@ -309,7 +319,7 @@ try:
                         percentage = percentage+'0%'
                     else:
                         percentage = percentage + '%'
-                    print(f'{percentage:<10}  -  {complete_time: .5} sec', end='\r')
+                    print(f'{percentage:<3}  -  {complete_time: .5} sec', end='\r')
                 except:
                     pass
         except:
